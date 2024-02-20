@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 Bucket Policy Generator</title>
+    <style>
+        body {
+          font-family: 'Roboto', sans-serif; 
+        }
+        /* Add some basic styling for the box */
+        .info-box {
+          border: 1px solid #ccc;
+          padding: 10px;
+          margin-bottom: 15px;
+          font-family: 'Roboto', sans-serif;
+        }
+      </style>
+    <script>
+        function generatePolicy() {
+            // Get values from user input
+            var orgId = document.getElementById('orgId').value;
+            var bucketName = document.getElementById('bucketName').value;
+
+            // Replace placeholders in the policy
+            var policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Sid": "NatterboxBucketPermissions",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::257278351214:user/archiving-external-s3-" + orgId
+                        },
+                        "Action": [
+                            "s3:GetBucketLocation",
+                            "s3:ListBucket"
+                        ],
+                        "Resource": "arn:aws:s3:::" + bucketName
+                    },
+                    {
+                        "Sid": "NatterboxObjectPermissions",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": "arn:aws:iam::257278351214:user/archiving-external-s3-" + orgId
+                        },
+                        "Action": [
+                            "s3:PutObject",
+                            "s3:PutObjectAcl",
+                            "s3:GetObject",
+                            "s3:DeleteObject"
+                        ],
+                        "Resource": "arn:aws:s3:::" + bucketName + "/*"
+                    }
+                ]
+            };
+
+            // Display the generated policy
+            document.getElementById('generatedPolicy').innerText = JSON.stringify(policy, null, 2);
+        }
+    </script>
+</head>
+<body>
+    <h2>S3 Bucket Policy Generator</h2>
+    <form>
+        <label for="orgId">Org ID:</label>
+        <input type="text" id="orgId" required><br>
+
+        <label for="bucketName">Bucket Name:</label>
+        <input type="text" id="bucketName" required><br>
+
+        <button type="button" onclick="generatePolicy()">Generate Policy</button>
+    </form>
+
+    <h3>Generated Policy:</h3>
+    <pre id="generatedPolicy"></pre>
+</body>
+</html>
